@@ -1,0 +1,10 @@
+body {
+  margin: 0;
+  font-family: 'Poppins', sans-serif;
+}
+
+router-outlet {
+  display: block;
+  margin-top: 20px; 
+  /* prevent navbar overlap */
+}

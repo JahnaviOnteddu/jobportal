@@ -1,0 +1,46 @@
+
+
+<div class="jobs-page">
+  <div class="filters">
+    <input type="text" placeholder="Job Title" [(ngModel)]="filters.jobTitle" (ngModelChange)="onFilterChange()" />
+    <input type="text" placeholder="Location" [(ngModel)]="filters.jobLocation" (ngModelChange)="onFilterChange()" />
+    <select [(ngModel)]="filters.jobType" (ngModelChange)="onFilterChange()">
+      <option value="">All</option>
+      <option value="FULL_TIME">Full Time</option>
+      <option value="PART_TIME">Part Time</option>
+      <option value="INTERNSHIP">Internship</option>
+    </select>
+    <label>
+      <input type="checkbox" [(ngModel)]="filters.onsite" (change)="onFilterChange()" /> Onsite
+    </label>
+  </div>
+
+  <div *ngIf="jobs?.length === 0" class="no-jobs">No jobs found.</div>
+
+  <div class="job-cards">
+    <div
+      class="job-card" 
+      *ngFor="let j of jobs | paginate: { itemsPerPage: pageSize, currentPage: currentPage, totalItems: totalJobs }"
+    >
+      <div class="job-header">
+        <h3>{{ j.jobTitle }}</h3>
+        <span class="company">{{ j.recruiter?.companyName }}</span>
+      </div>
+      <div class="job-details">
+        <p><strong>Location:</strong> {{ j.jobLocation }}</p>
+        <p><strong>Type:</strong> {{ j.jobType }}</p>
+        <p><strong>Experience:</strong> {{ j.yearsOfExperience || 'Not specified' }}</p>
+      </div>
+      <div class="job-footer">
+        <a class = "nav-link" [routerLink]="['/applicant/jobs/apply', j.jobId]" class="apply-btn">Apply Now</a>
+
+      </div>
+    </div>
+  </div>
+
+  <pagination-controls
+   
+    (pageChange)="onPageChange($event)"
+  ></pagination-controls>
+</div>
+

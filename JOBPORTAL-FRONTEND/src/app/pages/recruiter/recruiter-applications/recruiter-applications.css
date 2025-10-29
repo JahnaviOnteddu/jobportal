@@ -1,0 +1,27 @@
+.applications-container {
+  max-width: 900px;
+  margin: 20px auto;
+  padding: 20px;
+}
+
+.application-card {
+  background: #fff;
+  border-radius: 12px;
+  padding: 15px;
+  box-shadow: 0 3px 8px rgba(0,0,0,0.1);
+  margin-bottom: 20px;
+}
+
+.actions button {
+  margin-right: 10px;
+  background: #007bff;
+  border: none;
+  padding: 6px 12px;
+  color: #fff;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.actions button:hover {
+  background: #0056b3;
+}
