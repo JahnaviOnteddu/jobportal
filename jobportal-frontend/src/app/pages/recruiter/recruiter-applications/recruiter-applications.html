@@ -1,0 +1,20 @@
+<!-- <div class="applications-container">
+  <h2>Applications for Your Jobs</h2>
+
+  <div *ngIf="jobs.length === 0" class="empty">No applications yet.</div>
+
+  <div *ngFor="let app of jobs" class="application-card">
+    <h3>{{ app.jobTitle }}</h3>
+    <p><b>Applicant:</b> {{ app }}</p>
+    <p><b>Status:</b> {{ app.status }}</p>
+    <p><b>Applied On:</b> {{ app.appliedAt | date:'medium' }}</p>
+
+    <a *ngIf="app.digitalResumeUrl" [href]="app.digitalResumeUrl" target="_blank">View Resume</a>
+
+    <div class="actions">
+      <button (click)="updateStatus(app.applicationId, 'Accepted')">Accept</button>
+      <button (click)="updateStatus(app.applicationId, 'Rejected')">Reject</button>
+      <button (click)="updateStatus(app.applicationId, 'Pending')">Pending</button>
+    </div>
+  </div>
+</div> -->

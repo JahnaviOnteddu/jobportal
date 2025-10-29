@@ -1,0 +1,62 @@
+<!-- <div class="container mt-5 pt-5 d-flex justify-content-center">
+  <form class="p-4 border rounded shadow w-50" (ngSubmit)="Login()">
+    <h3 class="text-center mb-3">Login</h3>
+    <div class="mb-3">
+      <input type="email" [(ngModel)]="email" name="email" class="form-control" placeholder="Email" required>
+    </div>
+    <div class="mb-3">
+      <input type="password" [(ngModel)]="password" name="password" class="form-control" placeholder="Password" required>
+    </div>
+    
+    <button class="btn btn-primary w-100" (click) = "Login()">Login</button>
+  </form>
+</div>
+
+ -->
+<div class="login-page d-flex align-items-center justify-content-center vh-100">
+  <div class="login-card shadow-lg p-5 rounded-4">
+    <h2 class="text-center mb-4 fw-bold text-primary">Welcome Back 👋</h2>
+    <p class="text-center text-muted mb-4">Login to continue to your account</p>
+
+    <form (ngSubmit)="Login()">
+      <div class="mb-4">
+        <input
+          type="email"
+          [(ngModel)]="email"
+          name="email"
+          class="form-control form-control-lg"
+          placeholder="Enter your email"
+          required
+        />
+      </div>
+
+      <div class="mb-4">
+        <input
+          type="password"
+          [(ngModel)]="password"
+          name="password"
+          class="form-control form-control-lg"
+          placeholder="Enter your password"
+          required
+        />
+      </div>
+
+      <button type="submit" class="btn btn-primary btn-lg w-100 mb-3">
+        Login
+      </button>
+
+      <div class="text-center">
+        <a routerLink="/forgot-password" class="text-decoration-none text-secondary">
+          Forgot Password?
+        </a>
+      </div>
+
+      <div class="text-center mt-3">
+        <span class="text-muted">New user? </span>
+        <a class = "nav-link" [routerLink]="['/register']" class="text-primary fw-semibold text-decoration-none">
+          Register here
+        </a>
+      </div>
+    </form>
+  </div>
+</div>

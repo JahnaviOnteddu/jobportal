@@ -1,0 +1,15 @@
+<!-- recruiter.html -->
+<nav class="navbar">
+  <div class="logo">Recruiter Dashboard</div>
+  <ul class="nav-links">
+    <li><a class="nav-link" [routerLink]="['/recruiter']">Home</a></li>
+    <!-- <a class="nav-link" [routerLink]="['/']">Home</a> -->
+    <li><a [routerLink]="['/recruiter/post-job']">Post Job</a></li>
+    <li><a [routerLink]="['/recruiter/recruiter-applications']">View Applications</a></li>
+    <li><a (click)="logout()">Logout</a></li>
+  </ul>
+</nav>
+
+<div class="content">
+  <router-outlet></router-outlet>
+</div>
