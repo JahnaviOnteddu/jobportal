@@ -1,0 +1,112 @@
+pipeline {
+    agent any
+
+    environment {
+        DOCKERHUB_REPO_FE = 'jobportal-frontend'
+        DOCKERHUB_REPO_BE = 'jobportal-backend'
+        AWS_REGION = 'us-east-2'
+    }
+ tools {
+    maven 'maven'        // If you named it "Maven-3.9"
+    nodejs 'npm'       // If you named it "NodeJS-22"
+}
+
+    stages {
+        stage('Checkout') {
+            steps {
+                git branch: 'main', url: 'https://github.com/JahnaviOnteddu/jobportal.git'
+            }
+        }
+
+        stage('Build Backend') {
+            steps {
+                dir('jobportal-backend') {
+                    bat 'mvn clean package -DskipTests'
+                }
+            }
+        }
+
+        stage('Build Frontend') {
+            steps {
+                dir('jobportal-frontend') {
+                    bat 'npm install'
+                    bat 'npm run build -- --configuration production'
+                }
+            }
+        }
+
+        stage('Docker Build & Push') {
+            steps {
+                script {
+                    // Generate unique timestamp tag
+                    def VERSION = new Date().format("yyyyMMddHHmmss")
+
+                    env.IMAGE_BE = "${DOCKERHUB_REPO_BE}:${VERSION}"
+                    env.IMAGE_FE = "${DOCKERHUB_REPO_FE}:${VERSION}"
+                    env.LATEST_BE = "${DOCKERHUB_REPO_BE}:latest"
+                    env.LATEST_FE = "${DOCKERHUB_REPO_FE}:latest"
+
+                    withCredentials([usernamePassword(credentialsId: 'DOCKERHUB-CREDENTIALS',
+                                                      usernameVariable: 'DOCKERHUB_USER',
+                                                      passwordVariable: 'DOCKERHUB_PASS')]) {
+                        bat """
+                        docker build --no-cache -t %DOCKERHUB_USER%/${env.IMAGE_BE} jobportal-backend
+                        docker build --no-cache -t %DOCKERHUB_USER%/${env.IMAGE_FE} jobportal-frontend
+                        echo %DOCKERHUB_PASS% | docker login -u %DOCKERHUB_USER% --password-stdin
+                        docker push %DOCKERHUB_USER%/${env.IMAGE_BE}
+                        docker push %DOCKERHUB_USER%/${env.IMAGE_FE}
+                        docker tag %DOCKERHUB_USER%/${env.IMAGE_BE} %DOCKERHUB_USER%/${env.LATEST_BE}
+                        docker tag %DOCKERHUB_USER%/${env.IMAGE_FE} %DOCKERHUB_USER%/${env.LATEST_FE}
+                        docker push %DOCKERHUB_USER%/${env.LATEST_BE}
+                        docker push %DOCKERHUB_USER%/${env.LATEST_FE}
+                        """
+                    }
+                }
+            }
+        }
+
+        stage('Terraform Apply') {
+            steps {
+                withCredentials([[$class: 'AmazonWebServicesCredentialsBinding',
+                                  credentialsId: 'AWS-CREDENTIALS']]) {
+                    dir('infra') {
+                        bat 'terraform init'
+                        bat 'terraform apply -auto-approve'
+                    }
+                }
+            }
+        }
+
+        stage('Deploy to EC2') {
+            steps {
+                withCredentials([sshUserPrivateKey(credentialsId: 'PEM', keyFileVariable: 'KEYFILE')]) {
+                    script {
+                        dir('jobportal-infra') {
+                            def ec2_ip = powershell(returnStdout: true, script: '(terraform output -raw ec2_public_ip).Trim()').trim()
+                            echo "EC2 Public IP: ${ec2_ip}"
+
+                            // Fix key permissions for SSH
+                            bat """
+                            icacls "%KEYFILE%" /inheritance:r
+                            icacls "%KEYFILE%" /grant "SYSTEM:F"
+                            icacls "%KEYFILE%" /grant "Administrators:F"
+                            """
+
+                            // Clean up old containers/images on EC2
+                            bat 'cmd /c ssh -o StrictHostKeyChecking=no -i "%KEYFILE%" ec2-user@' + ec2_ip + ' "docker stop $(docker ps -aq) || true && docker rm $(docker ps -aq) || true && docker rmi -f $(docker images -q) || true && docker system prune -af || true"'
+
+                            // Upload docker-compose.yml
+                            bat 'cmd /c scp -o StrictHostKeyChecking=no -i "%KEYFILE%" ..\\docker-compose.yml ec2-user@' + ec2_ip + ':~/docker-compose.yml'
+
+                            // Pull and start the new containers
+                            bat 'cmd /c ssh -o StrictHostKeyChecking=no -i "%KEYFILE%" ec2-user@' + ec2_ip + ' "docker-compose -f ~/docker-compose.yml pull && docker-compose -f ~/docker-compose.yml up -d --force-recreate"'
+
+                            // List running containers
+                            bat 'cmd /c ssh -o StrictHostKeyChecking=no -i "%KEYFILE%" ec2-user@' + ec2_ip + ' "docker ps"'
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
