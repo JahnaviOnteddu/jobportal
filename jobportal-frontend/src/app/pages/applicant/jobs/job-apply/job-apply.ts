@@ -5,6 +5,7 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import { JobService } from '../../../../service/job-service';
 import { Auth } from '../../../../service/auth';
+import { environment } from '../../../../../environments/environment';
 
 @Component({
   selector: 'app-job-apply',
@@ -16,7 +17,7 @@ import { Auth } from '../../../../service/auth';
 export class JobApply implements OnInit {
 
   jobId!: number;
-  applicantId: number | null = null ; // TODO: Replace with logged-in user ID
+  applicantId: number | null = null;
   coverLetter: string = '';
   jobDetails: any;
   userResumeId: number | null = null;
@@ -26,12 +27,12 @@ export class JobApply implements OnInit {
     private route: ActivatedRoute,
     private http: HttpClient,
     private jobService: JobService,
-    private router: Router , 
-    private auth : Auth
+    private router: Router,
+    private auth: Auth
   ) {}
 
   ngOnInit() {
-    this.applicantId = this.auth.getApplicantId() ; 
+    this.applicantId = this.auth.getApplicantId();
     this.jobId = Number(this.route.snapshot.paramMap.get('id'));
     this.loadJobDetails();
     this.loadUserResume();
@@ -43,7 +44,6 @@ export class JobApply implements OnInit {
       next: (data) => {
         console.log('✅ Job details loaded:', data);
         this.jobDetails = data;
-        console.log(this.jobDetails) ; 
       },
       error: (err) => console.error('❌ Error loading job:', err)
     });
@@ -51,7 +51,7 @@ export class JobApply implements OnInit {
 
   // 🔹 Fetch user's digital resume
   loadUserResume() {
-    this.http.get(`http://localhost:8080/api/resume/${this.applicantId}`).subscribe({
+    this.http.get(`${environment.apiUrl}/resume/${this.applicantId}`).subscribe({
       next: (res: any) => {
         console.log('✅ Resume found:', res);
         this.userResumeId = res.resumeId;
@@ -80,7 +80,7 @@ export class JobApply implements OnInit {
 
     console.log('📤 Applying with request:', req);
 
-    this.http.post('http://localhost:8080/api/applications', req).subscribe({
+    this.http.post(`${environment.apiUrl}/applications`, req).subscribe({
       next: () => {
         alert('✅ Application submitted successfully!');
         this.router.navigate(['/applicant/applications']);
