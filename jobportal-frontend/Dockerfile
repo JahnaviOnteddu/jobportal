@@ -24,18 +24,35 @@
 # CMD ["nginx", "-g", "daemon off;"]
 
 
-# Stage 1: Build the frontend application
+# # Stage 1: Build the frontend application
+# FROM node:22.21-alpine AS build
+# WORKDIR /app
+# COPY package*.json ./
+# RUN npm install
+# COPY . .
+# RUN npm run build -- --configuration=production
+
+# # Stage 2: Serve with Nginx
+# FROM nginx:alpine
+# # COPY nginx.conf /etc/nginx/nginx.conf
+# COPY --from=build /app/dist/JOBPORTAL-FRONTEND /usr/share/nginx/html
+# # COPY nginx.conf /etc/nginx/nginx.conf
+# EXPOSE 80
+# CMD ["nginx", "-g", "daemon off;"]
+
+# Stage 1: Build Angular app
 FROM node:22.21-alpine AS build
 WORKDIR /app
 COPY package*.json ./
 RUN npm install
 COPY . .
-RUN npm run build -- --configuration=production
+RUN npm run build -- --configuration production
 
-# Stage 2: Serve with Nginx
+# Stage 2: Nginx server
 FROM nginx:alpine
-# COPY nginx.conf /etc/nginx/nginx.conf
 COPY --from=build /app/dist/JOBPORTAL-FRONTEND /usr/share/nginx/html
-# COPY nginx.conf /etc/nginx/nginx.conf
+COPY nginx.conf /etc/nginx/conf.d/default.conf
+
 EXPOSE 80
 CMD ["nginx", "-g", "daemon off;"]
+
