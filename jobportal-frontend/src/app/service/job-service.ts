@@ -2,14 +2,13 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { Job } from '../models/JobPosting.model';
 import { HttpClient, HttpParams } from '@angular/common/http';
+import { environment } from '../../environments/environment';  // ✅ import environment
 
 @Injectable({
   providedIn: 'root'
 })
-
-
 export class JobService {
-  base = 'http://localhost:8080/api/jobs';
+  private baseUrl = `${environment.apiUrl}/jobs`;  // ✅ updated
 
   constructor(private http: HttpClient) {}
 
@@ -20,30 +19,22 @@ export class JobService {
         params = params.set(k, String(filters[k]));
       }
     });
-    return this.http.get<any>(`${this.base}/active`, { params });
+    return this.http.get<any>(`${this.baseUrl}/active`, { params });
   }
 
   getJobById(id: number): Observable<any> {
-  return this.http.get(`${this.base}/${id}`);
-}
-  applyJob(formData: FormData): Observable<any> {
-  return this.http.post('http://localhost:8080/api/applications', formData);
-}
-
-
-
-  
- postJob(job: Job): Observable<any> {
-  return this.http.post(`${this.base}/create`, job);
-}
-
-
-  getJobsByRecruiter(recruiterId: number): Observable<Job[]> {
-    return this.http.get<Job[]>(`${this.base}/recruiter/${recruiterId}`);
+    return this.http.get(`${this.baseUrl}/${id}`);
   }
 
+  applyJob(formData: FormData): Observable<any> {
+    return this.http.post(`${environment.apiUrl}/applications`, formData);  // ✅ updated
+  }
 
+  postJob(job: Job): Observable<any> {
+    return this.http.post(`${this.baseUrl}/create`, job);
+  }
 
-
-
+  getJobsByRecruiter(recruiterId: number): Observable<Job[]> {
+    return this.http.get<Job[]>(`${this.baseUrl}/recruiter/${recruiterId}`);
+  }
 }
