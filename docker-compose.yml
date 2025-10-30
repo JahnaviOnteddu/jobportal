@@ -1,20 +1,47 @@
+# version: "3.9"
+
+# services:
+#   backend:
+#     build: ./JOBPORTAL-BACKEND
+#     container_name: jobportal-backend
+#     ports:
+#       - "8080:8080"     # Host:Container (Spring Boot runs on 8080)
+#     restart: always
+#     networks:
+#       - jobportal-network
+
+#   frontend:
+#     build: ./JOBPORTAL-FRONTEND
+#     container_name: jobportal-frontend
+#     ports:
+#       - "80:80"       # Host:Container (Nginx serves on 80)
+#     depends_on:
+#       - backend
+#     restart: always
+#     networks:
+#       - jobportal-network
+
+# networks:
+#   jobportal-network:
+#     driver: bridge
+
 version: "3.9"
 
 services:
   backend:
-    build: ./JOBPORTAL-BACKEND
+    image: jahnavionteddu1/jobportal-backend:latest
     container_name: jobportal-backend
     ports:
-      - "8080:8080"     # Host:Container (Spring Boot runs on 8080)
+      - "8080:8080"
     restart: always
     networks:
       - jobportal-network
 
   frontend:
-    build: ./JOBPORTAL-FRONTEND
+    image: jahnavionteddu1/jobportal-frontend:latest
     container_name: jobportal-frontend
     ports:
-      - "80:80"       # Host:Container (Nginx serves on 80)
+      - "80:80"
     depends_on:
       - backend
     restart: always
@@ -24,3 +51,4 @@ services:
 networks:
   jobportal-network:
     driver: bridge
+
