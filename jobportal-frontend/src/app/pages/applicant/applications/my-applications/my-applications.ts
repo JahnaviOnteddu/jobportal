@@ -5,6 +5,7 @@ import { ApplicationService } from '../../../../service/application-service';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { Auth } from '../../../../service/auth';
+import { environment } from '../../../../../environments/environment';
 
 @Component({
   selector: 'app-my-applications',
@@ -17,15 +18,16 @@ export class MyApplications implements OnInit {
   applications: any[] = [];
   applicantId: number | null = null;
   message = '';
-  // localStorage.setItem('applicantId', response.applicantId);
 
-
-  constructor(private http: HttpClient , private router : Router , private applicationService : ApplicationService, private auth : Auth) {}
+  constructor(
+    private http: HttpClient,
+    private router: Router,
+    private applicationService: ApplicationService,
+    private auth: Auth
+  ) {}
 
   ngOnInit(): void {
-   
-    this.applicantId = this.auth.getApplicantId() ;  
-    // localStorage.getItem('applicantId');
+    this.applicantId = this.auth.getApplicantId();
 
     if (this.applicantId) {
       this.loadApplications();
@@ -37,7 +39,7 @@ export class MyApplications implements OnInit {
 
   loadApplications(): void {
     this.http
-      .get<any[]>(`http://localhost:8080/api/applications/applicant/${this.applicantId}`)
+      .get<any[]>(`${environment.apiUrl}/applications/applicant/${this.applicantId}`)
       .subscribe({
         next: (data) => {
           this.applications = data;
@@ -61,18 +63,5 @@ export class MyApplications implements OnInit {
   }
 
   // ✅ Withdraw an application
-  withdraw(applicationId: number) {
-  if (confirm('Are you sure you want to withdraw this application?')) {
-    this.applicationService.deleteApplication(applicationId).subscribe({
-      next: () => {
-        this.applications = this.applications.filter(app => app.applicationId !== applicationId);
-        alert('Application withdrawn successfully!');
-      },
-      error: (err) => console.error('Error withdrawing application:', err)
-    });
-  }
-}
-
-  
-}
-
+  withdraw(applicationId: number): void {
+    if (confirm('Are you sure you want to withdraw
