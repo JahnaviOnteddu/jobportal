@@ -63,5 +63,17 @@ export class MyApplications implements OnInit {
   }
 
   // ✅ Withdraw an application
-  withdraw(applicationId: number): void {
-    if (confirm('Are you sure you want to withdraw
+  // ✅ Withdraw an application
+withdraw(applicationId: number): void {
+  if (confirm('Are you sure you want to withdraw this application?')) {
+    this.applicationService.deleteApplication(applicationId).subscribe({
+      next: () => {
+        this.applications = this.applications.filter(app => app.applicationId !== applicationId);
+        alert('Application withdrawn successfully!');
+      },
+      error: (err) => console.error('Error withdrawing application:', err)
+    });
+  }
+}
+
+}
