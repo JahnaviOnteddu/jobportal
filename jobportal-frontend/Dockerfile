@@ -71,7 +71,7 @@ FROM nginx:alpine
 RUN rm -rf /etc/nginx/conf.d/default.conf
 
 # Copy built Angular files
-COPY --from=build /app/dist/JOBPORTAL-FRONTEND /usr/share/nginx/html
+COPY --from=build /app/dist/JOBPORTAL-FRONTEND/browser /usr/share/nginx/html
 
 # Copy custom nginx config
 COPY nginx.conf /etc/nginx/conf.d/default.conf
